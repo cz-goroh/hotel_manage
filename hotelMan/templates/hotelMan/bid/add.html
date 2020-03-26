@@ -1,0 +1,236 @@
+
+  {% extends "admin/base_site.html" %}
+
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+{{ media }}
+{% endblock %}
+
+  {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+
+  {% block coltype %}colM{% endblock %}
+
+  {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+
+  {% if not is_popup %}
+  {% block breadcrumbs %}
+  <div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; {% if has_view_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+  &rsaquo; {% if add %}{% blocktrans with name=opts.verbose_name %}Add {{ name }}{% endblocktrans %}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+  </div>
+  {% endblock %}
+  {% endif %}
+{% block content %}<div id="content-main">
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+  <ul class="object-tools">
+    {% block object-tools-items %}
+      {% change_form_object_tools %}
+    {% endblock %}
+  </ul>
+{% endif %}{% endif %}
+{% endblock %}
+<h2>{{facility}}</h2>
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+{% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+{% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+{% if errors %}
+    <p class="errornote">
+    {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+{% endif %}
+
+<!-- {% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" %}
+{% endfor %}
+{% endblock %} -->
+
+
+
+  <fieldset class="module aligned ">
+        <div class="form-row field-begin">
+                <div>
+                        <label class="required" for="id_begin_0">Заезд:</label>
+                            <p class="datetime">
+  Дата: <input type="date" name="begin_0"  size="10" required id="id_begin_0">
+<br>
+  Время: <input type="time" name="begin_1"  size="8" required id="id_begin_1">
+</p>
+                </div>
+        </div>
+        <div class="form-row field-end">
+                <div>
+                        <label class="required" for="id_end_0">Выезд:</label>
+                            <p class="datetime">
+  Дата: <input type="date" name="end_0" class="" size="10" required id="id_end_0" />
+<br>
+  Время: <input type="time" name="end_1" class="" size="8" required id="id_end_1">
+</p>
+                </div>
+        </div>
+        <div class="form-row field-room">
+                <div>
+                        <label class="required" for="id_room">Комната:</label>
+                            <div class="related-widget-wrapper">
+{{request.GET.room}}
+<input type="hidden" value="{{request.GET.room}}" name="room" id="id_room" />
+        <a class="related-widget-wrapper-link change-related" id="change_id_room"
+            data-href-template="/hotadmin/hotelMan/room/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "Комната""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_room"
+            href="/hotadmin/hotelMan/room/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "Комната""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+</div>
+                </div>
+        </div>
+        {%if request.GET.bed%}
+        <div class="form-row field-bed">
+                <div>
+                        <label for="id_bed">Спальное место:</label>
+                            <div class="related-widget-wrapper">
+    {{request.GET.bed}}
+    <input type="hidden" value="{{request.GET.bed}}" name="bed" id="id_bed" />
+
+        <a class="related-widget-wrapper-link change-related" id="change_id_bed"
+            data-href-template="/hotadmin/hotelMan/bed/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "Спальное место""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_bed"
+            href="/hotadmin/hotelMan/bed/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "Спальное место""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+</div>
+                </div>
+        </div>
+  {%else%}
+  <input type="hidden" value="{{request.GET.bed}}" name="room" id="id_bed" />
+  {%endif%}
+        <div class="form-row field-empl">
+                <div>
+                        <label class="required" for="id_empl">Сотрудник:</label>
+                            <div class="related-widget-wrapper">{{empl}}
+  <input type="hidden" name="empl" required id="id_empl" value="{{empl.id}}"  />
+    <!-- <select name="empl" required id="id_empl">
+  <option value="" selected>---------</option>
+  <option value="1">Иван</option>
+  <option value="2">Пётр</option>
+</select> -->
+        <a class="related-widget-wrapper-link change-related" id="change_id_empl"
+            data-href-template="/hotadmin/hotelMan/employee/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "Сотрудник""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_empl"
+            href="/hotadmin/hotelMan/employee/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "Сотрудник""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+
+</div>
+                </div>
+        </div>
+        <input type="hidden" name="price" id="id_price" value="0">
+
+        <div class="form-row field-tarif">
+                <div>
+                        <label class="required" for="id_tarif">Тариф:</label>
+                            <div class="related-widget-wrapper">
+    <select name="tarif" required id="id_tarif">
+  <option value="" selected>---------</option>
+  {%for tarif in tarifs%}
+    <option value="{{tarif.id}}" selected>{{tarif}}</option>
+  {%endfor%}
+</select>
+        <a class="related-widget-wrapper-link change-related" id="change_id_tarif"
+            data-href-template="/hotadmin/hotelMan/tarif/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "Тариф""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_tarif"
+            href="/hotadmin/hotelMan/tarif/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "Тариф""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+</div>
+                </div>
+        </div>
+        <div class="form-row field-status">
+                <div>
+                        <label class="required" for="id_status">Статус бронирования:</label>
+                            <select name="status" required id="id_status">
+  <option value="" selected>---------</option>
+  <option value="reserved">Резерв</option>
+  <option value="bron">Бронь</option>
+</select>
+                </div>
+        </div>
+        <div class="form-row field-origin">
+                <div>
+                        <label class="required" for="id_origin">Источник:</label>
+                            <div class="related-widget-wrapper">
+    <select name="origin" required id="id_origin">
+  <option value="" selected>---------</option>
+  <option value="1">Наш сайт</option>
+  <option value="2">Менеджер</option>
+</select>
+        <a class="related-widget-wrapper-link change-related" id="change_id_origin"
+            data-href-template="/hotadmin/hotelMan/origin/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "Источник бронирования""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_origin"
+            href="/hotadmin/hotelMan/origin/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "Источник бронирования""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+</div>
+                </div>
+        </div>
+        <div class="form-row field-client">
+                <div>
+                        <label for="id_client">Клиент:</label>
+                            <div class="related-widget-wrapper">
+    <select name="client" id="id_client">
+  <option value="" selected>---------</option>
+  <option value="1">Пётр</option>
+</select>
+        <a class="related-widget-wrapper-link change-related" id="change_id_client"
+            data-href-template="/hotadmin/hotelMan/client/__fk__/change/?_to_field=id&amp;_popup=1"
+            title="Изменить выбранный объект типа "client""><img src="/static/admin/img/icon-changelink.svg" alt="Изменить"></a><a class="related-widget-wrapper-link add-related" id="add_id_client"
+            href="/hotadmin/hotelMan/client/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа "client""><img src="/static/admin/img/icon-addlink.svg" alt="Добавить"></a>
+</div>
+                </div>
+        </div>
+        <div class="form-row field-discount">
+                <div>
+                        <label class="required" for="id_discount">Скидка:</label>
+
+                            <input type="number" name="discount" value="0" step="0.01" required id="id_discount">
+                </div>
+
+        </div>
+        <div>
+          <label >Залог:</label><input type="number" name="zalog" value="0" step="0.1" />
+          </div>
+
+</fieldset>
+
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
+{% block after_related_objects %}{% endblock %}
+
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    <script type="text/javascript"
+            id="django-admin-form-add-constants"
+            src="{% static 'admin/js/change_form.js' %}"
+            {% if adminform and add %}
+                data-model-name="{{ opts.model_name }}"
+            {% endif %}>
+    </script>
+{% endblock %}
+
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}
+
+</div>
+</form></div>
+{% endblock %}

@@ -1,0 +1,213 @@
+<h3>Фильтры</h3>
+<!-- {{ok}} -->
+<br />Заезд <input class="rad_inp" type="date" name="begin" id="begin"/> -
+            <input type="date" name="begin1" id="begin1"/>
+<!-- {{bid_statuses}} -->
+<select name="status" id="status">
+  <option value="">Поаказать</option>
+  {%for st in bid_statuses%}
+    <option value="{{st.0}}">{{st.1}}</option>
+  {%endfor%}
+</select>
+
+<select name="metro" id="metro">
+  <option value="">Станция метро</option>
+  {%for metr in metro_st%}
+    <option value="{{metr.id}}">{{metr.name}}</option>
+  {%endfor%}
+</select>
+
+<br />Выезд <input type="date" name="end" id="end"/> -
+            <input type="date" name="end1" id="end1"/>
+
+<select name="origin" id="origin">
+  <option value="">Источник</option>
+  {%for or in origins%}
+  <option value="{{or.id}}">{{or}}</option>
+  {%endfor%}
+</select>
+
+<select name="room_cat" id="room_cat">
+  <option value="">Тип комнаты</option>
+  {%for rc in room_cat%}
+  <option value="{{rc.id}}">{{rc}}</option>
+  {%endfor%}
+</select>
+<br />Дата бронирования
+<input type="date" name="ins" id="ins"/> -
+<input type="date" name="ins" id="ins1"/>
+
+<select name="empls" id="empls">
+  <option value="">Сотрудник</option>
+  {%for emp in empls%}
+  <option value="{{emp.id}}">{{emp}}</option>
+  {%endfor%}
+</select>
+
+<select name="facitilytis" id="facitilitys">
+  <option value="">Объект</option>
+  {%for fac in facitilytis%}
+  <option value="{{fac.id}}">{{fac}}</option>
+  {%endfor%}
+</select>
+<br /><select name="lev_payd" id="lev_payd">
+  <option value="">Оплата</option>
+  <option value="part">Есть</option>
+  <option value="no">Нет</option>
+</select>
+
+<br />
+<button type="button" id="sendFilters" name="sendFilters" value="Применить">Применить</button> {{fs}}<div id="te"></div>
+<script>
+  $('#sendFilters').click(function(){
+    var arr=[]
+    begin__gte = $('#begin').val();
+    begin__lte = $('#begin1').val();
+    end__gte = $('#end').val();
+    end__lte = $('#end1').val();
+    ins__gte = $('#ins').val();
+    ins__lte = $('#ins1').val();
+    status = $('#status :selected').val();
+    origin = $('#origin :selected').val();
+
+    room_cat = $('#room_cat :selected').val();
+    metro = $('#metro :selected').val();
+    employee = $('#empls :selected').val();
+    facitility = $('#facitilitys :selected').val();
+    lev_payd = $('#lev_payd :selected').val();
+
+    if(lev_payd) {
+      lev_payd = 'lev_payd=' + lev_payd;
+      arr.push(lev_payd);
+    }
+    if(room_cat) {
+      room_cat = 'room__category__id__exact=' + room_cat;
+      arr.push(room_cat);
+    }
+    if(metro) {
+      metro = 'room__facility__metro__id__exact=' + metro;
+      arr.push(metro);
+    }
+    if(employee) {
+      employee = 'empl__id__exact=' + employee;
+      arr.push(employee);
+    }
+    if(facitility) {
+      facitility = 'room__facility__id__exact=' + facitility;
+      arr.push(facitility);
+    }
+    if (begin__gte) {
+      begin__gte = 'begin__gte=' + begin__gte;
+      arr.push(begin__gte)
+    } else {begin__gte = '';};
+    if (begin__lte) {
+      begin__lte = 'begin__lte=' + begin__lte;
+      arr.push(begin__lte)
+    } else {begin__lte = '';};
+
+    if (end__gte) {
+      end__gte = 'end__gte=' + end__gte;
+      arr.push(end__gte)
+    } else {end__gte = '';};
+    if (end__lte) {
+      end__lte = 'end__lte=' + end__lte;
+      arr.push(end__lte)
+    } else {end__lte = '';};
+
+    if (ins__gte) {
+      ins__gte = 'ins__gte=' + ins__gte;
+      arr.push(ins__gte)
+    } else {ins__gte = '';};
+    if (ins__lte) {
+      ins__lte = 'ins__lte=' + ins__lte;
+      arr.push(ins__lte)
+    } else {ins__lte = '';};
+
+    if (origin) {
+      origin = 'origin__id__exact=' + origin;
+      arr.push(origin)
+    } else {origin = '';};
+    if (status) {
+      status = 'status__exact=' + status;
+      arr.push(status)
+    } else {status = '';};
+
+
+    var gurl = arr.join('&')
+    $('#te').html('/hotadmin/hotelMan/bid/?' + gurl);
+    // $.get('/hotadmin/hotelMan/bid/?');
+    window.location = '/hotadmin/hotelMan/bid/?' + gurl;
+  });
+
+</script>
+<!-- // http://185.144.31.162:8002/hotadmin/hotelMan/bid/?begin__gte=2019-10-29+00%3A00%3A00%2B00%3A00&begin__lt=2019-11-06+00%3A00%3A00%2B00%3A00&client__name=%D0%9F%D1%91%D1%82%D1%80&end__gte=2019-10-29+00%3A00%3A00%2B00%3A00&end__lt=2019-11-06+00%3A00%3A00%2B00%3A00&ins__gte=2019-11-05+00%3A00%3A00%2B00%3A00&ins__lt=2019-11-06+00%3A00%3A00%2B00%3A00&status__exact=reserved -->
+<h3>Список бронирований</h3>
+<div  style="overflow-x: auto;">
+<table>
+  <thead>
+    <tr>
+      <th style="padding: 10px;">ID</th>
+      <th style="padding: 10px;">Автор</th>
+      <th style="padding: 10px;">Дата бронирования</th>
+      <th style="padding: 10px;">Район / номер / место</th>
+      <th style="padding: 10px;">Заезд</th>
+      <th style="padding: 10px;">Выезд</th>
+      <th style="padding: 10px;">ФИО</th>
+      <th style="padding: 10px;">Стоимость</th>
+      <th style="padding: 10px;">Оплачено</th>
+      <!-- <th>Мест</th> -->
+      <th style="padding: 10px;">Статус</th>
+      <th style="padding: 10px;">Операции</th>
+      </tr>
+    </thead>
+<!-- ID -->
+{%for obj in cl.result_list %}
+  <tr>
+    <td><a href="/hotadmin/hotelMan/bid/{{obj.id}}/change/">{{obj.id}}</a></td>
+    <td>
+      <!-- Автор -->
+      {{obj.empl}}{{obj.paysum}}
+      <!-- {{qs}} -->
+    </td>
+    <td>
+      <!-- Дата бронирования -->
+      {{obj.ins}}
+    </td>
+    <td>
+      <!-- Район / номер / место -->
+      {{obj.room.facility.district}} / {{obj.room}} / {{obj.show_bed}}
+    </td>
+    <td>
+      <!-- Заезд -->
+      {{obj.begin}}
+    </td>
+    <td>
+      <!-- Выезд -->
+      {{obj.end}}
+    </td>
+    <td>
+      <!-- ФИО -->
+      {{obj.client.surname}} {{obj.client.name}} {{obj.client.otchcestvo}}
+    </td>
+    <td>
+      <!-- Стоимость -->
+      {{obj.price}}
+    </td>
+    <td>
+      <!-- Оплачено -->
+      {{obj.payd}}
+    </td>
+    <!-- <td>Мест</td> -->
+    <td>
+      <!-- Статус -->
+      {{obj.status_verb}}
+    </td>
+    <td>
+      <a href="http://185.144.31.162:8002/hotadmin/hotelMan/bid/{{obj.id}}/delete/">Удалить</a>
+      <!-- Операции -->
+    </td>
+  </tr>
+  {%endfor%}
+
+  </table>
+</div>

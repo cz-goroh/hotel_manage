@@ -1,0 +1,69 @@
+<h3>Список бронирований</h3>
+<div class="results" style="overflow-x: auto;">
+<table>
+  <thead>
+    <tr>
+      <th style="padding: 10px;">ID</th>
+      <th style="padding: 10px;">Название</th>
+      <th style="padding: 10px;">Район / объект</th>
+      <th style="padding: 10px;">Основных мест</th>
+      <th style="padding: 10px;">Дополнительных мест</th>
+      <th style="padding: 10px;">Тариф</th>
+      <th style="padding: 10px;">Категория</th>
+      <th style="padding: 10px;">Этаж</th>
+      <th style="padding: 10px;">Статус</th>
+      <th style="padding: 10px;">Операции</th>
+      </tr>
+    </thead>
+<!-- ID -->
+{%for obj in cl.result_list %}
+  <tr>
+
+    <td><a href="/hotadmin/hotelMan/room/{{obj.id}}/change/">{{obj.id}}</a></td>
+    <td>
+      <!-- Название -->
+      {{obj.name}}
+    </td>
+    <td>
+      <!-- Район / объект -->
+      {{obj.facility.district}} / {{obj.facility}}
+    </td>
+    <td>
+      <!-- Основных мест -->
+      {{obj.category.osn_places}}
+    </td>
+    <td>
+      <!-- Дополнительных мест -->
+      {{obj.category.dop_places}}
+    </td>
+    <td>
+      <!-- Тариф -->
+      {{obj.tarif}}
+    </td>
+    <td>
+      <!-- Категория -->
+      {{obj.category}}
+    </td>
+    <td>
+      <!-- Этаж -->
+      {{obj.floor}}
+    </td>
+    <td>
+      <!-- Статус -->
+      {{obj.status_verb}}
+    </td>
+    <td>
+      <a href="http://185.144.31.162:8002/hotadmin/hotelMan/room/{{obj.id}}/delete/">Удалить</a>
+      <!-- Операции -->
+    </td>
+
+  </tr>
+{%endfor%}
+  </table>
+
+</div>
+<script>
+  $(document).ready(function(){
+
+  }
+</script>

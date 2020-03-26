@@ -1,0 +1,40 @@
+<h3>Список бронирований</h3>
+<div class="results" style="overflow-x: auto;">
+<table>
+  <thead>
+    <tr>
+      <th style="padding: 10px;">ID</th>
+      <th style="padding: 10px;">ФИО</th>
+      <th style="padding: 10px;">Телефон</th>
+      <th style="padding: 10px;">Email</th>
+      <th style="padding: 10px;">Иностранец</th>
+      <th style="padding: 10px;">Операции</th>
+      </tr>
+    </thead>
+<!-- ID -->
+{%for obj in cl.result_list %}
+  <tr>
+    <!-- ID -->
+    <td><a href="/hotadmin/hotelMan/room/{{obj.id}}/change/">
+      <input type="hidden" name="place_name_link" class="place_name_link" value="/hotadmin/hotelMan/room/{{obj.id}}/change/" />
+      {{obj.id}}</a></td>
+      <!-- ФИО -->
+      <td>{{obj.surname}} {{obj.name}} {{obj.otchestvo}}</td>
+      <!-- Телефон -->
+      <td>{{obj.tel}}    </td>
+      <!-- Email -->
+      <td>{{obj.email}}</td>
+
+      <!-- <img src="/static/admin/img/icon-yes.svg" alt="True"> -->
+      <!-- <img src="/static/admin/img/icon-no.svg" alt="False"> -->
+      <!-- Иностранец -->
+      <td>{%if obj.is_alien%}Да{%else%}Нет{%endif%}</td>
+
+    <td>
+      <a href = "http://185.144.31.162:8002/hotadmin/hotelMan/client/{{obj.id}}/delete/">Удалить</a>
+      <!-- Операции -->
+    </td>
+
+  </tr>
+{%endfor%}
+  </table></div>

@@ -1,0 +1,341 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script
+{% endblock %}
+
+{% block coltype %}{% endblock %}
+
+{% block bodyclass %}{{ block.super }} {% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+  <!-- <script src="{% static 'hotelMan/boolit.js'%}"></script> -->
+  <style>
+    .new{background-color: yellow;}
+    .payd{background-color: green;}
+    .left{ width: 8em;}
+    .segmented_room{background-color: #7CCEDF;}
+    .bed{background-color: #E8EB94;}
+    .fac{background-color: #EBA694;}
+    /* .day{width: 2em;} */
+    .td_none{ display: none; }
+    .cal_tab{padding:2px; table-layout: fixed; }
+    .cal_td{
+      border:1px solid black ;
+    }
+    .cal_head_td{width: 25px;}
+    .month_nm_head {width: 60px; margin:0; display: inline-block;}
+    /* статусы брони */
+    .reserved{background-color: #0891F7 !important;}
+    .bron{background-color: #08F797 !important;}
+    .live{background-color: #08F797 !important;}
+    .no_checkin{background-color: #B9F708 !important;}
+    .debt{background-color: #F77A08 !important;}
+    .del{background-color: #F70859 !important;}
+
+    /* .full_td{width: 100%;} */
+    .bid_td{}
+    .bool{
+      position:absolute;
+      display: none;
+      background-color: #E4EEFA;
+      padding: 5px;
+    }
+    .right_modal{
+      display:none;
+      position: absolute;
+      /* position: fixed; */
+      width:50%;
+      background-color: white;
+      z-index: 999;
+      /* float: right; */
+      right: 0;
+      top: 50;
+    }
+    .cursor_point{
+      cursor: pointer;
+    }
+    .overlay{
+      position: absolute;
+      top:0;
+      left:0;
+      bottom:0;
+      right:0;
+      width:100%;
+      height:100%;
+      z-index:998;
+      background-color: black;
+      opacity: .5;
+    }
+    .close_inf{ color:red; }
+
+    .indiv{width:20px;}
+    td{ padding: 2px !important; overflow: vizible !important; width: 600px;}
+    tr{ padding: 2px !important; }
+    table{
+      table-layout: fixed !important; /* Фиксированная ширина ячеек */
+    }
+
+  </style>
+  <script>
+    $(document).ready(function(){
+      $('.client_info').click(function(){
+        $(this).parent().children('.bool').show();
+
+      });
+      $('.close_inf').click(function(){
+        $(this).parent().hide();
+      });
+    });
+  </script>
+  <!-- периоды
+  поиск клиентов- выделялся цветом найденный клиент
+продление брон- создаёт новое бронирование
+-->
+     <!-- <form action="" method="get"> -->
+       <!-- кнопка начало месяца
+       недля вперёд месяц вперёд -->
+
+       <!-- {% csrf_token %} -->
+
+      <!-- <input type="submit", value="Выбрать"  /> -->
+      <!-- </form> -->
+
+      <div class="right_modal" id="new_bid">
+        <span class="close cursor_point">X Закрыть</span>
+        <div id="new_bid_in">
+
+          </div>
+      </div>
+      <button type="button" style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"><a href="/hotadmin/hotelMan/client/add/">Новый клиент</a></button>
+
+
+
+      <h3>Фильтры</h3>
+      Дата <input type="date" name="getdate" id="getdate" />
+
+
+       <button type="button" class="submit_button"
+       style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+        value="{{dashb.prev_month}}"><<</button>
+
+        <button type="button" class="submit_button"
+        style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+         value="{{dashb.prev_week}}"><</button>
+
+         <button type="button" class="submit_button"
+         style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+          value="{{dashb.today}}">Сегодня</button>
+
+         <button type="button" class="submit_button"
+         style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+          value="{{dashb.next_week}}">></button>
+
+          <button type="button" class="submit_button"
+          style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+           value="{{dashb.next_month}}">>></button>
+           <button type="button" class="submit_button"
+           style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+            value="{{dashb.fd_month}}">Начало месяца</button>
+      <!-- {{ok}} -->
+      <!-- <br />Заезд <input class="rad_inp" type="date" name="begin" id="begin"/> -
+                  <input type="date" name="begin1" id="begin1"/> -->
+      <!-- {{bid_statuses}} -->
+      <!-- <select name="status" id="status">
+        <option value="">Поаказать</option>
+        {%for st in bid_statuses%}
+          <option value="{{st.0}}">{{st.1}}</option>
+        {%endfor%}
+      </select> -->
+
+      <select name="metro" id="metro">
+        <option value="">Станция метро</option>
+        {%for metr in metro_st%}
+          <option value="{{metr.id}}">{{metr.name}}</option>
+        {%endfor%}
+      </select>
+
+      <!-- <br />Выезд <input type="date" name="end" id="end"/> -
+                  <input type="date" name="end1" id="end1"/> -->
+
+      <!-- <select name="origin" id="origin">
+        <option value="">Источник</option>
+        {%for or in origins%}
+        <option value="{{or.id}}">{{or}}</option>
+        {%endfor%}
+      </select> -->
+
+
+      <!-- <br />Дата бронирования
+      <input type="date" name="ins" id="ins"/> -
+      <input type="date" name="ins" id="ins1"/> -->
+
+      <select name="district" id="district">
+        <option value="">Район</option>
+        {%for dist in district%}
+        <option value="{{dist.id}}">{{dist}}</option>
+        {%endfor%}
+      </select>
+
+      <select name="facitilytis" id="facitilitys">
+        <option value="">Объект</option>
+        {%for fac in facitilytis%}
+        <option value="{{fac.id}}">{{fac}}</option>
+        {%endfor%}
+      </select>
+
+      <select name="period" id="period">
+        <option value="">Период</option>
+        <option value="30">30 Дней</option>
+        <option value="7">7 Дней</option>
+        <option value="60">60 Дней</option>
+        <option value="90">90 Дней</option>
+      </select>
+      <!-- <br /><select name="lev_payd" id="lev_payd">
+        <option value="">Оплата</option>
+        <option value="part">Есть</option>
+        <option value="no">Нет</option>
+      </select> -->
+      <!-- <select name="room_cat" id="room_cat">
+        <option value="">Тип комнаты</option>
+        {%for rc in room_cat%}
+        <option value="{{rc.id}}">{{rc}}</option>
+        {%endfor%}
+      </select> -->
+      <input type="checkbox" id="show_free"  />Показать свободные номера
+
+      <button type="button" class="submit_button" name="sendFilters"
+      style="border: 1px solid #ccc; border-radius: 4px; padding: 5px 6px;"
+       value="">Применить</button>
+
+
+      <script>
+
+        $('.submit_button').click(function(){
+          var arr=[]
+          getdate = $('#getdate').val();
+          if ($(this).val()){
+            getdate = $(this).val();
+          }
+          room_cat = $('#room_cat :selected').val();
+          period = $('#period :selected').val();
+          metro = $('#metro :selected').val();
+          district = $('#district :selected').val();
+          facitility = $('#facitilitys :selected').val();
+          show_free = $('#show_free').is(':checked');
+
+          if(show_free){
+            // alert(show_free);
+            arr.push('show_free=yes');
+          }
+
+          if(getdate){
+            getdate = 'getdate=' +getdate;
+            arr.push(getdate);
+          }
+          if(period){
+            period = 'period=' +period;
+            arr.push(period);
+          }
+
+          // if(room_cat) {
+          //   room_cat = 'room_category=' + room_cat;
+          //   arr.push(room_cat);
+          // }
+          if(metro) {
+            metro = 'metro=' + metro;
+            arr.push(metro);
+          }
+          if(district) {
+            district = 'district=' + district;
+            arr.push(district);
+          }
+          if(facitility) {
+            facitility = 'facility=' + facitility;
+            arr.push(facitility);
+          }
+
+          var gurl = arr.join('&')
+          // $('#te').html('/hotadmin/hotelMan/bid/?' + gurl);
+          // $.get('/hotadmin/hotelMan/bid/?');
+          window.location = '/hotadmin/?' + gurl;
+        });
+
+        </script>
+{%include 'hotelMan/dashb_table.html'%}
+<div id="content-main">
+{% if app_list %}
+    {% for app in app_list %}
+        <!-- <div class="app-{{ app.app_label }} module"> -->
+        <table>
+        <caption>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+        </caption>
+        {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+            {% if model.admin_url %}
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+            {% else %}
+                <th scope="row">{{ model.name }}</th>
+            {% endif %}
+
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+
+            {% if model.admin_url %}
+                {% if model.view_only %}
+                <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
+                {% else %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                {% endif %}
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>{% trans "You don't have permission to view or edit anything." %}</p>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<!-- <div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% trans 'Recent actions' %}</h2>
+        <h3>{% trans 'My actions' %}</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+            <p>{% trans 'None available' %}</p>
+            {% else %}
+            <ul class="actionlist">
+            {% for entry in admin_log %}
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                {% else %}
+                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                {% endif %}
+                <br>
+                {% if entry.content_type %}
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
+                {% else %}
+                    <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    </div>
+</div> -->
+{% endblock %}

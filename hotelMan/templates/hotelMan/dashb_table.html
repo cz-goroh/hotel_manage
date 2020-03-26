@@ -1,0 +1,164 @@
+<div style="max-width: 1500px;overflow: auto;">
+<table class="cal_tab" cellpadding=1 cellspacing=1 >
+
+  <tr class="cal_tab"><!-- шапка календарь -->
+    <td style="width: 60px;" class="cal_td">{{dashb.gettime|date:'F'}}</td>
+    {%for d in  dashb.cal_head %}
+      <td class="day cal_td"><div class="cal_head_td">{{d.day}}</div></td>
+    {%endfor%}
+  </tr>
+
+  {%for fac, rooms in dashb.facilitys.items%}
+    <tr class="fac "> <td class=" cal_td full_td">{{fac}}</td>
+      {%for d in  dashb.cal_head %}
+        <td class="day cal_td"></td>
+      {%endfor%}
+    </tr>
+    {%for room, room_dict in rooms.items%}
+      {%if room.is_berth%}
+      <!-- комната если дробится -->
+      <tr class="segmented_room full_td">
+        <td class="full_td cal_td">Номер {{room_dict.room.room_obj.name}}</td>
+        {%for d in  dashb.cal_head %}
+          <td class="day cal_td"></td>
+        {%endfor%}
+      </tr>
+        {%for bed, daydict in room_dict.room.room_beds_dict.items%}
+          <tr >
+            <td class="bed cal_td">Место {{bed.num}}
+
+              <!-- <a href="/hotadmin/hotelMan/bid/add/?fac={{fac.id}}&room={{room_dict.room.room_obj.id}}&bed={{bed.id}}" class="addlink"></a> -->
+              <a  class="addlink cursor_point add_bid"><input type="hidden" name="place_name_link" class="place_name_link" value="/hotadmin/hotelMan/bid/add/?fac={{fac.id}}&room={{room_dict.room.room_obj.id}}&bed={{bed.id}}&is_popup=yes" /></a>
+            </td>
+            {%for day, bid in daydict.items%}
+
+            <td class="
+            {%if bid.bid_info.0%}{{bid.bid_info.0.status}}  {%endif%} day
+            {%if not bid.bid_info.0.id %}cal_td {%endif%}">
+            <div class="indiv">
+              {%if bid.bid_flag%}
+              <span class="client_info cursor_point">{{bid.bid_info.0.client}}</span>
+              {%endif%}
+
+              <!-- {{bid.0.id}} -->
+              <!-- {{bid}} -->
+              <!-- {{bid.0.client}} -->
+              <div class="bool">
+                <span class="close_inf cursor_point">XЗакрыть</span>
+                <br />{{bid.bid_info.0.client}}
+                <br />Заезд{{bid.bid_info.0.begin}}
+                <br />Выезд{{bid.bid_info.0.end}}
+                <br />Суток {{bid.bid_calc.days}}
+                <br />К оплате  {{bid.bid_info.0.price}}
+                <br />Оплачено {{bid.bid_calc.pays}}
+                <br />Долг {{bid.bid_calc.debt}}
+                <br />Статус{{bid.bid_info.0.status}}
+                <br />Тел: {{bid.bid_info.0.tel}}
+                <br />Источник {{bid.bid_info.0.origin}}
+                <br />Сотрудник {{bid.bid_info.0.empl}}
+                <br />Добавлена {{bid.bid_info.0.ins}}
+                <br />ID {{bid.bid_info.0.id}}
+                <br />Продлить на:
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=1&bid={{bid.bid_info.0.id}}">Сутки</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=7&bid={{bid.bid_info.0.id}}">Неделю</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=28&bid={{bid.bid_info.0.id}}">4 Недели</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=1&bid={{bid.bid_info.0.id}}&to_month=1">Месяц</a>
+
+                <form action="{% url 'hotelMan:prolong'%}" >
+                До <input name="prolong_date" type="date"  />
+                <input type="hidden" value="{{bid.bid_info.0.id}}" name="bid"  />
+                <button type="submit" class="prolong_to_button">Продлить</button>
+                </form>
+                </div>
+              </div>
+            </td>
+
+            {%endfor%}
+          </tr>
+        {%endfor%}
+      {%else%}
+      <!-- если номер монолитный -->
+      <tr class="full_room bed">
+        <td class="cal_td">
+          Номер {{room_dict.room.room_obj.name}}
+          <!-- <a href="/hotadmin/hotelMan/bid/add/?fac={{fac.id}}&room={{room_dict.room.room_obj.id}}" class="addlink"></a> -->
+            <a  class="addlink cursor_point add_bid"><input type="hidden" name="place_name_link" class="place_name_link" value="/hotadmin/hotelMan/bid/add/?fac={{fac.id}}&room={{room_dict.room.room_obj.id}}&is_popup=yes" /></a>
+        </td>
+        {%for daystr, daybids in room_dict.room.room_dict.items%}
+          <td class=" day
+          {%if daybids.bid_info.0%}
+            {{daybids.bid_info.0.status}}
+          {%else%}cal_td{%endif%}" >
+            <!-- {{daybids.bid_flag}} -->
+            <div class="indiv">
+            {%if daybids.bid_info.0 and daybids.bid_flag %}
+              <span class="client_info cursor_point">{{daybids.bid_info.0.client}}</span>
+              <div class="bool">
+                <span class="close_inf cursor_point">X Закрыть</span>
+                <br />{{daybids.bid_info.0.client}}
+                <br />Заезд{{daybids.bid_info.0.begin}}
+                <br />Выезд{{daybids.bid_info.0.end}}
+                <br />Суток {{daybids.bid_calc.days}}
+                <br />К оплате  {{daybids.bid_info.0.price}}
+                <br />Оплачено {{daybids.bid_calc.pays}}
+                <br />Долг {{daybids.bid_calc.debt}}
+                <br />Статус {{daybids.bid_info.0.status}}
+                <br />Тел: {{daybids.bid_info.0.tel}}
+                <br />Источник {{daybids.bid_info.0.origin}}
+                <br />Сотрудник {{daybids.bid_info.0.empl}}
+                <br />Добавлена {{daybids.bid_info.0.ins}}
+                <br />ID {{daybids.bid_info.0.id}}
+                <br />Продлить на:
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=1&bid={{daybids.bid_info.0.id}}">Сутки</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=7&bid={{daybids.bid_info.0.id}}">Неделю</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=28&bid={{daybids.bid_info.0.id}}">4 Недели</a>
+                <a class="prolong" href="{% url 'hotelMan:prolong'%}?prolong=1&bid={{daybids.bid_info.0.id}}&to_month=1">Месяц</a>
+
+                <form action="{% url 'hotelMan:prolong'%}" >
+                До <input name="prolong_date" type="date"  />
+                <input type="hidden" value="{{daybids.bid_info.0.id}}" name="bid"  />
+                <button type="submit" class="prolong_to_button">Продлить</button>
+                </form>
+                </div>
+            {%endif%}</div>
+            </td>
+        {%endfor%}
+      </tr>
+      {%endif%}
+    {%endfor%}
+
+
+  {%endfor%}
+</table>
+</div>
+<script>
+  $(document).ready(function(){
+    $('.day').click(function(){
+      // alert('boolit');
+
+    })
+  });
+
+  $(document).ready(function(){
+    $('.addlink').click(function(){
+      var link = $(this).children('.place_name_link').val();
+      // alert(link);
+      $.get(
+            link,
+            {},
+            function(data){
+              $('#new_bid').show();
+              $('#new_bid_in').html(data);
+
+            }
+      );
+    });
+    $('.close').click(function(){
+      $('.right_modal').hide();
+    });
+    $('.prolong').click(function(){
+
+    });
+  });
+
+</script>
